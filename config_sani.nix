@@ -13,6 +13,43 @@
 #SSD
 fileSystems."/".options = [ "noatime" "nodiratime" "discard" ];
 
+systemd.timers."numlockx_boot" = {
+wantedBy = [ "timers.target" ];
+timerConfig = {
+OnStartupSec = "1us";
+AccuracySec = "1us";
+Unit = "numlockx.service";
+};
+};
+
+systemd.timers."numlockx_sleep" = {
+wantedBy = [
+"suspend.target"
+"hibernate.target"
+"hybrid-sleep.target"
+"suspend-then-hibernate.target"
+];
+after = [
+"suspend.target"
+"hibernate.target"
+"hybrid-sleep.target"
+"suspend-then-hibernate.target"
+];
+timerConfig = {
+AccuracySec = "1us";
+Unit = "numlockx.service";
+};
+};
+
+systemd.services."numlockx" = {
+script = ''
+${pkgs.numlockx}/bin/numlockx on
+'';
+serviceConfig = {
+Type = "oneshot"; # "simple" für Prozesse, die weiterlaufen sollen
+};
+};
+
 boot = {
     plymouth = {
       enable = true;
@@ -28,7 +65,7 @@ boot = {
     initrd.systemd.enable = true;
     # Enable "Silent Boot"
     consoleLogLevel = 0;
-    initrd.verbose = false;
+    # initrd.verbose = false;
     kernelParams = [
       "quiet"
       "splash"
@@ -41,7 +78,7 @@ boot = {
     # Hide the OS choice for bootloaders.
     # It's still possible to open the bootloader list by pressing any key
     # It will just not appear on screen unless a key is pressed
-    loader.timeout = 3;
+    loader.timeout = 4;
 
   };
 
@@ -145,10 +182,10 @@ systemd = {
   services.displayManager.defaultSession = "plasma";
 #   qt = {
 #   enable = true;
-#   platformTheme = "gnome";
-#   style = "adwaita-dark";
+#   platformtheme = "gnome";
+#   style = "adwaita";
 # };
-
+# programs.dconf.enable = true;
   services.thermald.enable = true;
 #   services.tlp = {
 #       enable = true;
@@ -210,6 +247,13 @@ systemd = {
       kdePackages.bluedevil
       kdePackages.kgpg
       kdePackages.okular
+      kdePackages.kmail
+      # Deps for kmail
+      kdePackages.akonadi 
+      kdePackages.akonadiconsole 
+      kdePackages.akonadi-search
+      kdePackages.akonadi-mime
+      kdePackages.akonadi-contacts
       # kdePackages.discover
       # kdePackages.partitionmanager
       kdePackages.polkit-kde-agent-1
@@ -229,7 +273,7 @@ systemd = {
 
   # Install firefox.
   programs.firefox.enable = true;
-services.pcscd.enable = true;
+  services.pcscd.enable = true;
 programs.gnupg.agent = {
    enable = true;
   pinentryPackage = pkgs.pinentry-qt;
@@ -291,6 +335,7 @@ fonts.packages = with pkgs; [
   vistafonts
   foot
   xorg.xeyes
+  numlockx
   zellij
   libva-utils
   ripgrep
