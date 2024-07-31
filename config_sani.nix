@@ -78,14 +78,14 @@ boot = {
     # Hide the OS choice for bootloaders.
     # It's still possible to open the bootloader list by pressing any key
     # It will just not appear on screen unless a key is pressed
-    loader.timeout = 4;
+    loader.timeout = 0;
 
   };
 
 # boot.plymouth.logo = "${pkgs.nixos-icons}/share/icons/hicolor/48x48/apps/nix-snowflake-white.png";
 
 
-users.users.eve.isNormalUser = true;
+users.users.stephin.isNormalUser = true;
 system.autoUpgrade.enable  = true;
 system.autoUpgrade.allowReboot  = false;
 # Home Manager
@@ -346,6 +346,7 @@ fonts.packages = with pkgs; [
   libreoffice-fresh
   vlc
   fzf
+  qalculate-qt
   aria
   ffmpeg
   nixfmt-rfc-style
@@ -356,6 +357,10 @@ fonts.packages = with pkgs; [
   glxinfo
   vulkan-tools
   wayland-utils
+  yazi
+  easyeffects
+  clamav
+  clamtk
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -369,13 +374,13 @@ fonts.packages = with pkgs; [
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
+   services.openssh.enable = true;
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+   networking.firewall.enable = false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -384,5 +389,10 @@ fonts.packages = with pkgs; [
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
+nix.gc = {
+  automatic = true;
+  dates = "weekly";
+  options = "--delete-older-than 7d";
+  };  
 
 }
